@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#080c0c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dead School">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23080c0c'/%3E%3Cpath d='M7 7h18v18H7zM11 11l5 12 5-12' fill='none' stroke='%23d7b679'/%3E%3C/svg%3E">
+    <meta name="description" content="The Dead School — a first-person school escape. Find five hidden keys. Keep your light close. Don't look away.">
+    <title>The Dead School</title>
+    <script type="module" crossorigin src="/the-dead-school/assets/index-Badai-HH.js"></script>
+    <link rel="stylesheet" crossorigin href="/the-dead-school/assets/index-BGNchia0.css">
+  </head>
+  <body data-phase="loading">
+    <canvas id="scene" aria-label="The Dead School, a first-person 3D school escape"></canvas>
+    <div id="red-flash" aria-hidden="true"></div>
+    <div id="blackout" aria-hidden="true"></div>
+    <div class="screen-grain" aria-hidden="true"></div>
+    <div class="screen-vignette" aria-hidden="true"></div>
+    <div id="menu-shade" aria-hidden="true"></div>
+    <header id="masthead">
+      <span class="brand"><span class="brand-mark" aria-hidden="true">V</span> THE DEAD SCHOOL</span>
+      <span class="chapter-label">CHAPTER 01 <span> / </span> AFTER HOURS</span>
+    </header>
+    <main id="panel" aria-labelledby="screen-title">
+      <p id="screen-eyebrow" class="eyebrow"><span class="live-dot" aria-hidden="true"></span> A SCHOOL ESCAPE</p>
+      <h1 id="screen-title"><span class="sr-only">The Dead School</span></h1>
+      <p id="screen-description" class="description">You were only driving past.<br>Now the school won't let you leave.</p>
+      <p id="status" role="status">Preparing the school…</p>
+      <div id="title-instructions" class="instructions" hidden>
+        <div><span class="instruction-number">01</span><p>Search everything.<small>Five golden keys, hidden in drawers, lockers, cisterns and worse. Read the walls for clues.</small></p></div>
+        <div><span class="instruction-number">02</span><p>Keep your light close.<small>A flashlight and batteries are your only defence against the figure.</small></p></div>
+        <div><span class="instruction-number">03</span><p>Watch the mannequins.<small>They can only move when you look away.</small></p></div>
+        <div><span class="instruction-number">04</span><p>Run when you must.<small>Hold Shift to sprint. Your legs give out faster than you think.</small></p></div>
+        <div><span class="instruction-number">05</span><p>Lost? Check the map.<small>It shows where you have been. Press H for a clue about the next key.</small></p></div>
+      </div>
+      <div id="clues" class="clues" hidden><span class="eyebrow">NOTES YOU FOUND</span><ul id="clue-list"></ul></div>
+      <div id="panel-actions" class="panel-actions">
+        <button id="start" class="primary-button" disabled>Enter the school <span class="button-arrow" aria-hidden="true"></span></button>
+        <button id="resume" class="primary-button" hidden>Resume <span class="button-arrow" aria-hidden="true"></span></button>
+        <button id="retry" class="primary-button" hidden>Retry from last key <span class="button-arrow" aria-hidden="true"></span></button>
+        <button id="restart" class="secondary-button" hidden>Start again</button>
+      </div>
+      <p id="pointer-note" class="pointer-note"><span class="mouse-note">Click to capture your mouse. Press <kbd>Esc</kbd> to pause.</span><span class="touch-note">Left thumb moves (push to the edge to run), right thumb looks, tap things to search. Hold your device sideways.</span> Headphones recommended.</p>
+      <details id="settings-panel" class="settings-panel">
+        <summary>Game settings <span aria-hidden="true">+</span></summary>
+        <div class="setting-row"><label for="sensitivity">Mouse sensitivity</label><input id="sensitivity" type="range" min="0.06" max="0.36" step="0.01" value="0.16"><output id="sensitivity-value" for="sensitivity">0.16</output></div>
+        <div class="setting-row"><label for="volume">Volume</label><input id="volume" type="range" min="0" max="1" step="0.05" value="0.35"><output id="volume-value" for="volume">35%</output></div>
+        <div class="setting-toggle"><label for="reduced-scares">Reduce scares<small>Softer capture, quieter threats, no red screen.</small></label><input id="reduced-scares" type="checkbox"></div>
+        <div class="setting-toggle"><label for="effects">Visual effects<small>Bloom, ambient shadows, vignette and grain. Turn off on slow machines.</small></label><input id="effects" type="checkbox" checked></div>
+        <div class="setting-toggle"><label for="camera-motion">Camera motion<small>Head bob and sway while walking.</small></label><input id="camera-motion" type="checkbox" checked></div>
+      </details>
+    </main>
+    <aside id="hud" aria-label="Game status" hidden>
+      <div class="hud-top">
+        <div class="objective"><span class="eyebrow">FIND A WAY OUT</span><span id="objective-text">Search the school for the five golden keys</span></div>
+        <div class="flashlight-status"><span id="flashlight-label">FIND A FLASHLIGHT</span><div class="charge-track" role="progressbar" aria-label="Flashlight battery" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="charge-fill"></span></div><span id="charge-text">—</span></div>
+      </div>
+      <div id="crosshair" aria-hidden="true"></div>
+      <div id="warning" role="status" hidden></div>
+      <div id="minimap-box"><span class="eyebrow">MAP</span><canvas id="minimap" width="136" height="216" aria-label="Map of the school showing explored rooms"></canvas><span id="minimap-note">H · CLUE</span></div>
+      <div id="stamina" role="progressbar" aria-label="Stamina" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span id="stamina-fill"></span></div>
+      <div class="hud-bottom">
+        <div class="keys-status">
+          <span class="eyebrow">EXIT KEYS</span>
+          <div id="key-icons" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <span id="key-count">0 / 5</span>
+          <div id="key-names" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="hud-centre"><div id="interaction" hidden><kbd>E</kbd><span id="interaction-text"></span></div><p id="message" role="status"></p></div>
+        <div class="control-hint"><span><kbd>W A S D</kbd> Move</span><span><kbd>Shift</kbd> Sprint</span><span><kbd>F</kbd> Flashlight</span><span><kbd>H</kbd> Clue</span><span><kbd>Esc</kbd> Pause</span></div>
+      </div>
+    </aside>
+    <button id="prompt-bubble" type="button" hidden><kbd>E</kbd><span id="prompt-bubble-label">Search</span></button>
+    <div id="touch-layer" aria-hidden="true">
+      <div id="touch-stick"><div id="touch-knob"></div></div>
+      <button id="touch-pause" type="button" aria-label="Pause">❚❚</button>
+      <div class="touch-buttons">
+        <button id="touch-clue" type="button">Clue</button>
+        <button id="touch-light" type="button">Light</button>
+      </div>
+      <p id="touch-hint">LEFT THUMB MOVES <b>·</b> PUSH TO THE EDGE TO RUN <b>·</b> RIGHT THUMB LOOKS <b>·</b> TAP THINGS TO SEARCH</p>
+    </div>
+    <div id="rotate-note" aria-hidden="true"><div><strong>Turn your phone sideways</strong><span>The Dead School plays in landscape.</span></div></div>
+    <footer id="menu-footer"><span>KEEP YOUR EYES OPEN.</span><span>WASD TO MOVE <b>·</b> SHIFT TO SPRINT <b>·</b> E TO SEARCH</span></footer>
+    <div id="cinematic-caption" aria-live="polite" hidden>Something is still here.</div>
+  </body>
+</html>
