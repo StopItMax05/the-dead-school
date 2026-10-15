@@ -9,10 +9,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Dead School">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23080c0c'/%3E%3Cpath d='M7 7h18v18H7zM11 11l5 12 5-12' fill='none' stroke='%23d7b679'/%3E%3C/svg%3E">
-    <meta name="description" content="The Dead School — a first-person school escape. Find five hidden keys. Keep your light close. Don't look away.">
+    <meta name="description" content="The Dead School — a first-person school escape. Twenty rooms, five hidden keys, two black figures, seven mannequins. Keep your light close. Don't look away.">
     <title>The Dead School</title>
-    <script type="module" crossorigin src="/the-dead-school/assets/index-B21M2Qym.js"></script>
-    <link rel="stylesheet" crossorigin href="/the-dead-school/assets/index-BGNchia0.css">
+    <script type="module" crossorigin src="/the-dead-school/assets/index-B6TLEHAI.js"></script>
+    <link rel="stylesheet" crossorigin href="/the-dead-school/assets/index-CCfgDU_r.css">
   </head>
   <body data-phase="loading">
     <canvas id="scene" aria-label="The Dead School, a first-person 3D school escape"></canvas>
@@ -29,13 +29,23 @@
       <p id="screen-eyebrow" class="eyebrow"><span class="live-dot" aria-hidden="true"></span> A SCHOOL ESCAPE</p>
       <h1 id="screen-title"><span class="sr-only">The Dead School</span></h1>
       <p id="screen-description" class="description">You were only driving past.<br>Now the school won't let you leave.</p>
+      <p id="death-hint" class="death-hint" hidden></p>
       <p id="status" role="status">Preparing the school…</p>
       <div id="title-instructions" class="instructions" hidden>
-        <div><span class="instruction-number">01</span><p>Search everything.<small>Five golden keys, hidden in drawers, lockers, cisterns and worse. Read the walls for clues.</small></p></div>
-        <div><span class="instruction-number">02</span><p>Keep your light close.<small>A flashlight and batteries are your only defence against the figure.</small></p></div>
-        <div><span class="instruction-number">03</span><p>Watch the mannequins.<small>They can only move when you look away.</small></p></div>
-        <div><span class="instruction-number">04</span><p>Run when you must.<small>Hold Shift to sprint. Your legs give out faster than you think.</small></p></div>
+        <div><span class="instruction-number">01</span><p>Search everything.<small>Five golden keys hidden somewhere in twenty rooms. Coins too: they buy kit for next time.</small></p></div>
+        <div><span class="instruction-number">02</span><p>Keep your light close.<small>A flashlight and batteries are your defence against the black figures. There are two.</small></p></div>
+        <div><span class="instruction-number">03</span><p>Watch the mannequins.<small>They can only move when you look away. They carry blades now.</small></p></div>
+        <div><span class="instruction-number">04</span><p>When the lights fail, hide.<small>Something rushes the corridors. Press Q at a locker or cupboard to climb in, and climb out before your breath runs out.</small></p></div>
         <div><span class="instruction-number">05</span><p>Lost? Check the map.<small>It shows where you have been. Press H for a clue about the next key.</small></p></div>
+      </div>
+      <div id="shop" class="shop" hidden>
+        <div class="shop-head"><span class="eyebrow">TUCK SHOP</span><span id="bank">0 coins</span></div>
+        <div class="shop-items">
+          <button type="button" class="shop-item" data-item="battery"><strong>Spare battery</strong><small>Press B for a fresh 65% whenever the light runs low.</small><span class="price">3 coins</span><span class="owned" data-owned="battery"></span></button>
+          <button type="button" class="shop-item" data-item="flare"><strong>Flare</strong><small>Press R: a burst of light that burns the figure off, batteries or not.</small><span class="price">5 coins</span><span class="owned" data-owned="flare"></span></button>
+          <button type="button" class="shop-item" data-item="lockpick"><strong>Lockpick</strong><small>Opens the padlocked door in the back corridor. Used up on the lock.</small><span class="price">4 coins</span><span class="owned" data-owned="lockpick"></span></button>
+        </div>
+        <p id="shop-note" class="shop-note">Coins hide in drawers, lockers and bags, and they are banked the moment you find them, caught or not. What you buy goes with you into the next run.</p>
       </div>
       <div id="clues" class="clues" hidden><span class="eyebrow">NOTES YOU FOUND</span><ul id="clue-list"></ul></div>
       <div id="panel-actions" class="panel-actions">
@@ -61,7 +71,8 @@
       </div>
       <div id="crosshair" aria-hidden="true"></div>
       <div id="warning" role="status" hidden></div>
-      <div id="minimap-box"><span class="eyebrow">MAP</span><canvas id="minimap" width="136" height="216" aria-label="Map of the school showing explored rooms"></canvas><span id="minimap-note">H · CLUE</span></div>
+      <div id="minimap-box"><span class="eyebrow">MAP</span><canvas id="minimap" width="204" height="150" aria-label="Map of the school showing explored rooms"></canvas><span id="minimap-note">H · CLUE</span></div>
+      <div id="hide-box" hidden><span class="eyebrow">HIDING</span><div class="breath-track" role="progressbar" aria-label="Breath" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span id="breath-fill"></span></div><span id="hide-note">E · Climb out</span></div>
       <div id="stamina" role="progressbar" aria-label="Stamina" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span id="stamina-fill"></span></div>
       <div class="hud-bottom">
         <div class="keys-status">
@@ -69,16 +80,21 @@
           <div id="key-icons" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
           <span id="key-count">0 / 5</span>
           <div id="key-names" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="kit-status"><span class="coin-dot" aria-hidden="true"></span><span id="coin-count">0 coins</span><span id="kit"></span></div>
         </div>
-        <div class="hud-centre"><div id="interaction" hidden><kbd>E</kbd><span id="interaction-text"></span></div><p id="message" role="status"></p></div>
-        <div class="control-hint"><span><kbd>W A S D</kbd> Move</span><span><kbd>Shift</kbd> Sprint</span><span><kbd>F</kbd> Flashlight</span><span><kbd>H</kbd> Clue</span><span><kbd>Esc</kbd> Pause</span></div>
+        <div class="hud-centre"><div id="interaction" hidden><kbd>E</kbd><span id="interaction-text"></span><span id="interaction-secondary"></span></div><p id="message" role="status"></p></div>
+        <div class="control-hint"><span><kbd>W A S D</kbd> Move</span><span><kbd>Shift</kbd> Sprint</span><span><kbd>F</kbd> Flashlight</span><span><kbd>Q</kbd> Hide</span><span><kbd>H</kbd> Clue</span><span><kbd>Esc</kbd> Pause</span></div>
       </div>
     </aside>
+    <div id="hide-overlay" aria-hidden="true"></div>
     <button id="prompt-bubble" type="button" hidden><kbd>E</kbd><span id="prompt-bubble-label">Search</span></button>
     <div id="touch-layer" aria-hidden="true">
       <div id="touch-stick"><div id="touch-knob"></div></div>
       <button id="touch-pause" type="button" aria-label="Pause">❚❚</button>
       <div class="touch-buttons">
+        <button id="touch-hide" type="button" hidden>Hide</button>
+        <button id="touch-flare" type="button" hidden>Flare</button>
+        <button id="touch-kit" type="button" hidden>Battery</button>
         <button id="touch-clue" type="button">Clue</button>
         <button id="touch-light" type="button">Light</button>
       </div>
@@ -86,6 +102,6 @@
     </div>
     <div id="rotate-note" aria-hidden="true"><div><strong>Turn your phone sideways</strong><span>The Dead School plays in landscape.</span></div></div>
     <footer id="menu-footer"><span>KEEP YOUR EYES OPEN.</span><span>WASD TO MOVE <b>·</b> SHIFT TO SPRINT <b>·</b> E TO SEARCH</span></footer>
-    <div id="cinematic-caption" aria-live="polite" hidden>Something is still here.</div>
+    <div id="cinematic-caption" aria-live="polite" hidden>It was waiting in the trees.</div>
   </body>
 </html>
